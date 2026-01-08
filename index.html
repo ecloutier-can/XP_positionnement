@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outils de positionnement de mes habiletés technologiques en FAD</title>
+    <!-- Bibliothèques externes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary-bg: #2e3192;
+            --accent-color: #00a99d;
+            --header-height: 230px;
+            --bg-light: #f4f7f6;
+            --panel-bg: #ffffff;
+            --text-main: #333333;
+            --question-bg: #f8f9fa;
+            --border-color: #dddddd;
+            
+            --color-cat-0: #FF8F00; /* Élaboration */
+            --color-cat-1: #00B0FF; /* Démarche */
+            --color-cat-2: #00E676; /* Organisation */
+            --color-cat-3: #D500F9; /* Encadrement */
+
+            --color-debutant: #FF8F00;
+            --color-inter: #00B0FF;
+            --color-expert: #00E676;
+
+            --card-border-danger: #e74c3c;
+            --card-border-gestion: #00a99d;
+            --card-border-result: #8e44ad;
+        }
+
+        .dark-mode {
+            --bg-light: #121212;
+            --panel-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+            --question-bg: #2d2d2d;
+            --border-color: #444444;
+            --accent-color: #00d1c1;
+        }
+
+        * { box-sizing: border-box; scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0; padding: 0;
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        header {
+            height: var(--header-height);
+            background: linear-gradient(135deg, #1b1e5d 0%, #2e3192 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.3);
+            z-index: 1000; flex-shrink: 0;
+        }
+
+        header h1 { margin: 0; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
+        .header-profile { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; margin: 5px 0; opacity: 0.9; }
+
+        #user-name {
+            background: rgba(255,255,255,0.1); border: none; border-bottom: 2px solid var(--accent-color);
+            color: white; padding: 2px 10px; font-weight: bold; text-align: center; width: 220px; border-radius: 4px 4px 0 0;
+        }
+
+        .action-station { display: flex; gap: 15px; justify-content: center; width: 100%; margin-top: 10px; }
+
+        button.action-card { 
+            background: var(--panel-bg); color: var(--text-main); border: none; border-bottom: 4px solid var(--accent-color);
+            padding: 10px 20px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 0.85rem; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            display: flex; flex-direction: column; align-items: center; gap: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); min-width: 110px;
+        }
+        .btn-card-danger { border-bottom-color: var(--card-border-danger) !important; }
+        .btn-card-gestion { border-bottom-color: var(--card-border-gestion) !important; }
+        .btn-card-result { border-bottom-color: var(--card-border-result) !important; }
+        button.action-card:hover { transform: translateY(-8px); box-shadow: 0 12px 20px rgba(0,0,0,0.25); filter: brightness(1.05); }
+
+        .settings-stack { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; margin-left: 10px; }
+        .dark-mode-card { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: white; transition: transform 0.3s; }
+        .save-indicator { cursor: help; font-size: 1rem; opacity: 0.5; }
+
+        main { display: flex; flex: 1; height: calc(100vh - var(--header-height)); overflow: hidden; }
+
+        #panel-questions { width: 550px; background: var(--panel-bg); border-right: 1px solid var(--border-color); overflow-y: auto; padding: 25px; flex-shrink: 0; position: relative; }
+
+        .quick-nav { display: flex; gap: 5px; margin-bottom: 20px; position: sticky; top: -25px; background: var(--panel-bg); padding: 10px 0; z-index: 100; border-bottom: 1px solid var(--border-color); }
+        .nav-btn { background: var(--question-bg); border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; font-weight: bold; color: var(--text-main);}
+
+        #right-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* --- Section Maîtrise Globale : Piliers de Cristal --- */
+        #panel-chart {
+            height: 380px; background: var(--panel-bg); border-bottom: 1px solid var(--border-color);
+            display: flex; flex-direction: column; justify-content: flex-start; align-items: center; 
+            padding: 15px; flex-shrink: 0;
+            background: radial-gradient(circle at center, var(--panel-bg) 0%, var(--bg-light) 100%);
+            position: relative;
+        }
+
+        .pillars-container {
+            display: flex; justify-content: space-around; align-items: flex-end;
+            width: 100%; max-width: 500px; height: 160px; margin: 10px 0;
+            position: relative; padding: 0 20px;
+        }
+
+        .pillar-wrapper {
+            display: flex; flex-direction: column; align-items: center; width: 60px; height: 100%;
+        }
+
+        .pillar-glass {
+            width: 35px; height: 130px; background: rgba(0,0,0,0.05); border: 1px solid var(--border-color);
+            border-radius: 5px; position: relative; overflow: hidden;
+            display: flex; align-items: flex-end;
+        }
+        .dark-mode .pillar-glass { background: rgba(255,255,255,0.05); }
+
+        .pillar-fill {
+            width: 100%; height: 0%; transition: height 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        /* Effet de grille à l'intérieur des piliers */
+        .pillar-dots {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(rgba(255,255,255,0.3) 1px, transparent 1px);
+            background-size: 4px 4px; pointer-events: none;
+        }
+
+        .pillar-label { font-size: 0.65rem; font-weight: bold; margin-top: 8px; text-transform: uppercase; color: var(--primary-bg); text-align: center; }
+        .dark-mode .pillar-label { color: var(--accent-color); }
+
+        /* Ligne de convergence globale */
+        #global-avg-line {
+            position: absolute; left: 45px; right: 45px; height: 2px;
+            background: white; box-shadow: 0 0 10px white;
+            z-index: 10; opacity: 0; transition: bottom 1s, opacity 0.5s;
+            pointer-events: none;
+        }
+        #global-avg-line::after {
+            content: 'Moyenne'; position: absolute; right: -40px; top: -7px;
+            font-size: 0.5rem; font-weight: bold; color: var(--primary-bg);
+            background: white; padding: 2px 4px; border-radius: 3px;
+        }
+
+        #gauge-label { font-weight: bold; font-size: 1.3rem; margin-top: 5px; text-align: center; }
+
+        #archetype-container { margin-top: 5px; text-align: center; }
+        #profile-type-badge { display: inline-block; font-size: 0.85rem; font-weight: 800; padding: 4px 14px; border-radius: 20px; background: var(--primary-bg); color: white; text-transform: uppercase; letter-spacing: 1px; }
+        #profile-description { font-size: 0.75rem; margin-top: 4px; color: var(--text-main); font-style: italic; max-width: 400px; line-height: 1.2; }
+
+        .growth-container { display: flex; gap: 30px; margin-top: 10px; }
+        .growth-stage { display: flex; flex-direction: column; align-items: center; opacity: 0.2; grayscale: 100%; transition: all 0.5s; }
+        .growth-stage span { font-size: 1.4rem; }
+        .stage-active { opacity: 1; filter: grayscale(0); transform: scale(1.1); }
+
+        #completion-tracker { font-size: 0.65rem; color: #888; margin-top: 5px; font-style: italic; }
+
+        #panel-resources { flex: 1; overflow-y: auto; padding: 25px; background: var(--bg-light); border-top: 2px solid var(--border-color); }
+        .notes-area { margin-top: 15px; width: 100%; padding: 10px; border: 1px dashed var(--accent-color); border-radius: 6px; background: var(--panel-bg); color: var(--text-main); font-family: inherit; font-size: 0.85rem; resize: vertical; min-height: 60px; }
+        .category-title-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent-color); margin: 25px 0 15px 0; padding-bottom: 5px; }
+        .category-title { color: var(--primary-bg); margin: 0; font-size: 1.05rem; font-weight: bold; }
+        .question-box { background: var(--question-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border-color); transition: all 0.3s; }
+        .question-box.answered { border-left: 5px solid var(--accent-color); }
+        .option { display: flex; align-items: flex-start; margin: 10px 0; cursor: pointer; font-size: 0.88rem; }
+        .option input { margin-right: 12px; margin-top: 3px; accent-color: var(--accent-color); flex-shrink: 0; }
+        .res-cat-header { background: var(--primary-bg); color: white; padding: 8px 15px; border-radius: 5px; font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .res-level-tag { background: var(--accent-color); padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; }
+        .res-item { background: var(--panel-bg); padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.03); font-size: 0.9rem; }
+        .res-item a { color: var(--accent-color); font-weight: bold; text-decoration: none; }
+        #res-preview-tooltip { position: absolute; display: none; z-index: 2000; width: 280px; background: var(--panel-bg); border: 2px solid var(--primary-bg); border-radius: 8px; padding: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); font-size: 0.85rem; pointer-events: none; color: var(--text-main); }
+        .info-icon { display: inline-flex; justify-content: center; align-items: center; width: 16px; height: 16px; background: var(--accent-color); color: white; border-radius: 50%; font-size: 10px; font-style: normal; margin-left: 5px; cursor: help; vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Outils de positionnement de mes habiletés technologiques en FAD</h1>
+    <div class="header-profile">Bonjour <input type="text" id="user-name" placeholder="Enseignant(e)" oninput="autoSaveData()">, voici votre bilan.</div>
+    <div class="action-station">
+        <button class="action-card btn-card-danger" onclick="resetForm()"><span>🔄</span> Réinitialiser</button>
+        <button class="action-card btn-card-gestion" onclick="saveJSON()"><span>💾</span> Sauvegarder</button>
+        <button class="action-card btn-card-gestion" onclick="document.getElementById('fileInput').click()"><span>📂</span> Ouvrir</button>
+        <input type="file" id="fileInput" style="display:none" onchange="loadJSON(event)">
+        <button class="action-card btn-card-result" onclick="exportPDF()"><span>📋</span> Plan PDF</button>
+        <button class="action-card btn-card-result" onclick="window.print()"><span>🖨️</span> Imprimer</button>
+        <div class="settings-stack">
+            <button class="dark-mode-card" onclick="toggleDarkMode()" id="dark-icon" title="Mode Sombre">🌙</button>
+            <div class="save-indicator" id="save-cloud" title="Sauvegarde auto">☁️</div>
+        </div>
+    </div>
+</header>
+
+<div id="res-preview-tooltip"></div>
+
+<main>
+    <section id="panel-questions">
+        <div class="quick-nav">
+            <button class="nav-btn" onclick="document.getElementById('cat-0').scrollIntoView()">1. Élaboration</button>
+            <button class="nav-btn" onclick="document.getElementById('cat-1').scrollIntoView()">2. Démarche</button>
+            <button class="nav-btn" onclick="document.getElementById('cat-2').scrollIntoView()">3. Organisation</button>
+            <button class="nav-btn" onclick="document.getElementById('cat-3').scrollIntoView()">4. Encadrement</button>
+        </div>
+        <div id="questions-list"></div>
+    </section>
+
+    <div id="right-container">
+        <section id="panel-chart">
+            <div class="pillars-container">
+                <div id="global-avg-line"></div>
+                <div class="pillar-wrapper">
+                    <div class="pillar-glass"><div class="pillar-fill" id="fill-0" style="background:var(--color-cat-0);"><div class="pillar-dots"></div></div></div>
+                    <span class="pillar-label">1. Élaboration</span>
+                </div>
+                <div class="pillar-wrapper">
+                    <div class="pillar-glass"><div class="pillar-fill" id="fill-1" style="background:var(--color-cat-1);"><div class="pillar-dots"></div></div></div>
+                    <span class="pillar-label">2. Démarche</span>
+                </div>
+                <div class="pillar-wrapper">
+                    <div class="pillar-glass"><div class="pillar-fill" id="fill-2" style="background:var(--color-cat-2);"><div class="pillar-dots"></div></div></div>
+                    <span class="pillar-label">3. Organisation</span>
+                </div>
+                <div class="pillar-wrapper">
+                    <div class="pillar-glass"><div class="pillar-fill" id="fill-3" style="background:var(--color-cat-3);"><div class="pillar-dots"></div></div></div>
+                    <span class="pillar-label">4. Encadrement</span>
+                </div>
+            </div>
+            
+            <div id="gauge-label">Moyenne : 0.00</div>
+
+            <div id="archetype-container" style="display:none">
+                <div id="profile-type-badge">ARCHÉTYPE</div>
+                <div id="profile-description">Description du profil...</div>
+            </div>
+
+            <div class="growth-container">
+                <div class="growth-stage" id="stage-debut"><span>🌱</span></div>
+                <div class="growth-stage" id="stage-inter"><span>🌿</span></div>
+                <div class="growth-stage" id="stage-expert"><span>🌳</span></div>
+            </div>
+            <div id="completion-tracker">0 / 20 questions répondues</div>
+        </section>
+
+        <section id="panel-resources">
+            <h2 style="margin-top:0">Votre Plan de Formation Personnalisé</h2>
+            <div id="resList"><p>Répondez au questionnaire pour générer vos recommandations sur mesure.</p></div>
+            <div id="transversal-resources">
+                <div class="category-title">ORGANISMES & COMMUNAUTÉS D'EXPERTS</div>
+                <div class="res-item"><strong>FADIO</strong> - Expertise Québec. <a href="https://fadio.net/" target="_blank" onmouseenter="showPreview(event, 'FADIO', 'Partage d’expertise interordres au Québec.')" onmouseleave="hidePreview()">Visiter</a></div>
+                <div class="res-item"><strong>CADRE21</strong> - Badges numériques. <a href="https://www.cadre21.org/axefad/" target="_blank" onmouseenter="showPreview(event, 'CADRE21', 'Formations certifiées enseignants.')" onmouseleave="hidePreview()">Visiter</a></div>
+                <div style="text-align: center; margin-top: 15px;"><img src="https://scontent.fyhu1-1.fna.fbcdn.net/v/t39.30808-1/404883401_122105338394121903_5166034736891145140_n.jpg?stp=dst-jpg_s480x480_tt6&_nc_cat=103&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=KDi4_6aa7GYQ7kNvwHCFhSE&_nc_oc=AdkS2V8mP8-XCdbVVif8_Eqt4ZwaVcPWQ9cdgiTFZlI3j0Olv3C2UiyqXBb0sbe0pbg&_nc_zt=24&_nc_ht=scontent.fyhu1-1.fna&_nc_gid=oTyuj9Dc4YcPkuALPkl5zg&oh=00_AfqzNXcjq1m6rp55ddRuf5dk6NL2LSBKMbopl4O8g1bDzA&oe=69633670" style="max-width: 100px; border-radius: 10px; border: 2px solid var(--accent-color);"></div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<script>
+    const archetypes = {
+        stratège: { t: "Le Stratège", d: "Profil équilibré. Vous jonglez avec brio entre technique, pédagogie et accompagnement." },
+        architecte: { t: "L'Architecte", d: "Expert en planification. Votre force réside dans le design pédagogique et la structure." },
+        facilitateur: { t: "Le Facilitateur", d: "L'humain est au cœur. Vous privilégiez un encadrement bienveillant et un soutien constant." },
+        explorateur: { t: "L'Explorateur Techno", d: "Maître des outils. Vous dynamisez vos cours par l'innovation et les ressources multimédias." }
+    };
+
+    const glossary = { "ADDIE": "Design : Analyse, Design, Dév., Imp., Éval.", "MISA": "Ingénierie Système Apprentissage.", "Triple concordance": "Alignement Objectifs/Activités/Évals.", "Nétiquette": "Politesse numérique.", "AFEST": "Action Formation Situation Travail.", "Synchrone": "Temps réel.", "Asynchrone": "Différé." };
+    function addGlossaryIcon(term) { return `<span style="border-bottom: 1px dotted var(--accent-color); cursor:help" onmouseenter="showPreview(event, '${term}', '${glossary[term]}')" onmouseleave="hidePreview()">${term}<i class="info-icon">i</i></span>`; }
+
+    const questions = [
+        { id: 0, cat: "1. ÉLABORATION DU COURS", q: [
+            { id: "q1", t: `1.1 Modèle utilisé (${addGlossaryIcon('ADDIE')}, ${addGlossaryIcon('MISA')}) ?`, a: "Non, expérience présentiel", b: "Pas systématiquement", c: "Régulièrement adapté" },
+            { id: "q2", t: "1.2 Test des outils technologiques ?", a: "Non", b: "Quelques outils", c: "Tout testé" },
+            { id: "q3", t: "1.3 Consultation ressources existantes ?", a: "Tout créer", b: "Occasionnellement", c: "Inventaire complet" },
+            { id: "q4", t: "1.4 Équipe multidisciplinaire ?", a: "Seul", b: "Ponctuellement", c: "Équipe complète" },
+            { id: "q5", t: "1.5 Plan d'amélioration continue ?", a: "Non", b: "Commentaires", c: "Plan formel" }
+        ]},
+        { id: 1, cat: "2. DÉMARCHE D'APPRENTISSAGE", q: [
+            { id: "q6", t: `2.1 Respect de la ${addGlossaryIcon('Triple concordance')} ?`, a: "Pas toujours", b: "Inégal", c: "Systématique" },
+            { id: "q7", t: "2.2 Variété des activités ?", a: "Lectures", b: "Moyenne", c: "Grande variété" },
+            { id: "q8", t: "2.3 Choix offerts aux apprenants ?", a: "Parcours unique", b: "Limité", c: "Plusieurs chemins" },
+            { id: "q9", t: "2.4 Structure du contenu ?", a: "Cours longs", b: "Unités larges", c: "Éléments ciblés" },
+            { id: "q10", t: "2.5 Clarté des attentes ?", a: "À déduire", b: "Ponctuelle", c: "Critères affichés" }
+        ]},
+        { id: 2, cat: "3. ORGANISATION DU COURS", q: [
+            { id: "q11", t: "3.1 Plan d'études spécifique FAD ?", a: "Adapté présentiel", b: "Incomplet", c: "Complet" },
+            { id: "q12", t: "3.2 Interface numérique ?", a: "Décousu", b: "Peu intuitif", c: "Convivial" },
+            { id: "q13", t: "3.3 Ressources multimédias ?", a: "Texte/PDF", b: "Vidéos simples", c: "Interactif/Podcast" },
+            { id: "q14", t: "3.4 Choix justifiés ?", a: "Populaires", b: "Besoins partiels", c: "Raison claire" },
+            { id: "q15", t: `3.5 Équilibre ${addGlossaryIcon('Synchrone')} / ${addGlossaryIcon('Asynchrone')} ?`, a: "Asynchrone", b: "Mélange inégal", c: "Équilibre pensé" }
+        ]},
+        { id: 3, cat: "4. ENCADREMENT DES APPRENANTS", q: [
+            { id: "q16", t: "4.1 Accueil des apprenants ?", a: "Débrouillardise", b: "Message simple", c: "Séance structurée" },
+            { id: "q17", t: "4.2 Formation aux outils ?", a: "Supposé acquis", b: "Guides", c: "Proactif" },
+            { id: "q18", t: `4.3 ${addGlossaryIcon('Nétiquette')} et délais ?`, a: "Non définis", b: "Peu clair", c: "Précis" },
+            { id: "q19", t: "4.4 Soutien autonomie ?", a: "À eux de s'organiser", b: "Conseils", c: "Stratégies" },
+            { id: "q20", t: `4.5 Engagement et ${addGlossaryIcon('AFEST')} ?`, a: "Travaux", b: "Ponctuel", c: "Suivi régulier" }
+        ]}
+    ];
+
+    const resourcesData = {
+        0: { debut: [{t:"CADRE21 - Explorateur", d:"Structuration systémique.", l:"https://cadre21.org/groupe-de-cours/scenarisation-pedagogique-en-fad"},{t:"TELUQ - Design", d:"Template pratique.", l:"https://jenseigneadistance.teluq.ca/mod/page/view.php?id=485"},{t:"Wikipedia - ADDIE", d:"Théorie.", l:"https://fr.wikipedia.org/wiki/Modèle_ADDIE"}], inter: [{t:"CADRE21 - Architecte", d:"Design complexe.", l:"https://www.cadre21.org/axefad/"}, {t:"Cégep Trois-Rivières", d:"Modèles FAD.", l:"https://pratiquesfad.ca/quel-modele-choisir-ca-depend/"}], expert: [{t:"CADRE21 - Innovateur", d:"Leadership FAD.", l:"https://www.cadre21.org/axefad/"}, {t:"Beedeez", d:"Modèles avancés.", l:"https://www.beedeez.com/fr/blog/quest-ce-que-le-modele-addie"}] },
+        1: { debut: [{t:"HEC Montréal - Alignement", d:"Triple concordance.", l:"https://enseigner.hec.ca/pedagogie/alignement-pedagogique/"}, {t:"CADRE21 - Pédagogie active", d:"Bases.", l:"https://cadre21.org/groupe-de-cours/pedagogie-active-en-fad"}, {t:"Formagora", d:"Méthode active.", l:"https://www.formagora.fr/actualites/quest-ce-que-la-methode-pedagogique-active-et-comment-la-pratiquer"}], inter: [{t:"CADRE21 - Répertoire", d:"20 stratégies.", l:"https://www.cadre21.org/axefad/repertoire-des-strategies-pedagogiques/"}, {t:"Univ. Bordeaux", d:"Alignement.", l:"https://enseigner.u-bordeaux.fr/politique-de-formation/"}], expert: [{t:"ENPC - Théories", d:"Innovation.", l:"https://pedagotheque.enpc.fr/2016/05/04/quest-ce-que-la-pedagogie-active/"}, {t:"BBF - Mode d'emploi", d:"Projets/Cas.", l:"https://bbf.enssib.fr/consulter/bbf-2018-16-0016-002"}] },
+        2: { debut: [{t:"Moodle - Lancement", d:"Fonctionnalités.", l:"https://moodle.com/fr/"}, {t:"RÉCIT FAD - Technique", d:"Moodle/Outils.", l:"https://recitfad.ca/moodledocs/guide-conception-fad.html"}, {t:"Itslearning", d:"Optimisation.", l:"https://u2p-normandie.fr/optimiser-apprentissage-numerique/"}], inter: [{t:"AUF - Administration", d:"Gestion LMS.", l:"https://formations.auf.org/home/formation-ific/"}, {t:"RÉCIT FAD - Plugiciels", d:"Améliorer Moodle.", l:"https://ecolebranchee.com/plugiciels-sur-mesure-favoriser-apprentissage-moodle/"}], expert: [{t:"Moodle Workplace", d:"Personnalisation.", l:"https://moodle.com/fr/solutions/technologie-informatique/"}, {t:"FADIO - Ateliers", d:"Ingénierie réelle.", l:"https://fadio.net/evenements/semaine-de-la-formation-a-distance/ateliers-de-la-semaine-fad-2022/"}] },
+        3: { debut: [{t:"The Conversation - Accompagner", d:"Motivation.", l:"https://theconversation.com/formation-a-distance-comment-accompagner-les-apprenants-quon-ne-rencontre-pas-241999"}, {t:"Sherpas", d:"Gestion du temps.", l:"https://sherpas.com/p/guide-soutien-scolaire/aider-gestion-temps-organisation.html"}, {t:"Le Social", d:"Sans rencontre.", l:"https://www.lesocial.fr/formation/1695-formation-a-distance-comment-accompagner-les-apprenants-quon-ne-rencontre-pas"}], inter: [{t:"OpenEdition - FOAD", d:"Approches techno.", l:"https://journals.openedition.org/dms/9061"}, {t:"EduQuest", d:"Autonomie.", l:"https://www.eduquest.fr/soutien-scolaire-a-domicile-comment-concilier-autonomie-et-encadrement/"}, {t:"WALT - Soutien", d:"Individualisation.", l:"https://www.walt-asso.fr/strategies-soutien-pedagogiques-individualisation-apprentissage/"}], expert: [{t:"Cabestan - AFEST", d:"Pratique réflexive.", l:"https://www.cabestan-formation.fr/formation-devenir-accompagnateur-afest-2-jours/"}, {t:"Icademie", d:"IA adaptive.", l:"https://www.icademie.com/fr/guide/les-differences-entre-formation-a-distance-fad-et-foad"}] }
+    };
+
+    const qList = document.getElementById('questions-list');
+    questions.forEach(group => {
+        qList.innerHTML += `<div class="category-title-container" id="cat-${group.id}"><h3 class="category-title">${group.cat}</h3><span class="cat-progress-badge" id="badge-${group.id}">0%</span></div>`;
+        group.q.forEach(item => {
+            qList.innerHTML += `<div class="question-box" id="box-${item.id}"><span class="question-text">${item.t}</span>
+                <label class="option"><input type="radio" name="${item.id}" value="1" onchange="updateProgression('${item.id}')"> A) ${item.a}</label>
+                <label class="option"><input type="radio" name="${item.id}" value="2" onchange="updateProgression('${item.id}')"> B) ${item.b}</label>
+                <label class="option"><input type="radio" name="${item.id}" value="3" onchange="updateProgression('${item.id}')"> C) ${item.c}</label></div>`;
+        });
+        qList.innerHTML += `<textarea class="notes-area" id="notes-${group.id}" placeholder="Réflexions pour ce domaine (optionnel)..." oninput="autoSaveData()"></textarea>`;
+    });
+
+    function showPreview(e, title, desc) { 
+        const tooltip = document.getElementById('res-preview-tooltip');
+        tooltip.innerHTML = `<h4>${title}</h4><p>${desc}</p>`; tooltip.style.display = 'block'; tooltip.style.left = (e.pageX + 15) + 'px'; tooltip.style.top = (e.pageY + 15) + 'px'; 
+    }
+    function hidePreview() { document.getElementById('res-preview-tooltip').style.display = 'none'; }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        document.getElementById('dark-icon').innerText = document.body.classList.contains('dark-mode') ? "☀️" : "🌙";
+    }
+
+    function exportPDF() {
+        const name = document.getElementById('user-name').value || "Enseignant(e)";
+        const element = document.createElement('div');
+        element.innerHTML = `<h1 style="color:#2e3192; text-align:center">BILAN FAD : ${name.toUpperCase()}</h1><div style="padding:20px; border:1px solid #ddd; border-radius:10px"><h2>Profil : ${currentPersonaTitle}</h2><p>Moyenne : ${currentAvg}</p><hr>${document.getElementById('resList').innerHTML}</div>`;
+        html2pdf().set({ margin: 10, filename: `PlanFAD_${name}.pdf`, html2canvas: { scale: 2 }, jsPDF: { format: 'a4' } }).from(element).save();
+    }
+
+    let currentPersonaTitle = "";
+    let currentAvg = "0.00";
+
+    function updateProgression(lastId) {
+        if(lastId) document.getElementById('box-'+lastId).classList.add('answered');
+        let sumGlobal = 0, totalAnswered = 0, resHtml = "";
+        let catAverages = [];
+
+        questions.forEach((group, idx) => {
+            let catSum = 0, catCount = 0;
+            group.q.forEach(q => {
+                const el = document.querySelector(`input[name="${q.id}"]:checked`);
+                if(el) { catSum += parseInt(el.value); catCount++; }
+            });
+            document.getElementById('badge-'+group.id).innerText = Math.round((catCount / 5) * 100) + "%";
+            
+            const catAvg = catCount > 0 ? catSum / catCount : 0;
+            catAverages.push(catAvg);
+            sumGlobal += catSum; totalAnswered += catCount;
+
+            // --- ANIMATION PILLIERS ---
+            const fillHeight = catAvg > 0 ? ((catAvg - 1) / 2) * 100 : 0;
+            document.getElementById(`fill-${idx}`).style.height = fillHeight + "%";
+
+            if(catCount > 0) {
+                let key = catAvg <= 1.6 ? "debut" : (catAvg <= 2.4 ? "inter" : "expert");
+                let label = catAvg <= 1.6 ? "DÉBUTANT" : (catAvg <= 2.4 ? "INTERMÉDIAIRE" : "EXPERT");
+                resHtml += `<div class="res-cat-block"><div class="res-cat-header">${group.cat} <span class="res-level-tag">Niveau : ${label}</span></div>`;
+                resourcesData[idx][key].forEach(res => { resHtml += `<div class="res-item"><strong>${res.t}</strong><br><a href="${res.l}" target="_blank" onmouseenter="showPreview(event, '${res.t.replace(/'/g, "\\'")}', '${res.d.replace(/'/g, "\\'")}')" onmouseleave="hidePreview()">Consulter</a></div>`; });
+                resHtml += `</div>`;
+            }
+        });
+
+        let globalAvg = totalAnswered > 0 ? (sumGlobal / totalAnswered) : 0;
+        currentAvg = globalAvg.toFixed(2);
+        
+        // Ligne de moyenne globale
+        const line = document.getElementById('global-avg-line');
+        if(globalAvg > 0) {
+            line.style.opacity = 1;
+            line.style.bottom = (11 + (((globalAvg - 1) / 2) * 130)) + "px"; // 11px de padding bas + calcul
+        } else { line.style.opacity = 0; }
+
+        const sD = document.getElementById('stage-debut'), sI = document.getElementById('stage-inter'), sE = document.getElementById('stage-expert');
+        [sD, sI, sE].forEach(s => s.classList.remove('stage-active'));
+
+        let gLvl = "À déterminer", gCol = "#888";
+        if(globalAvg > 0) {
+            if(globalAvg <= 1.6) { gLvl = "DÉBUTANT"; gCol = '#FF8F00'; sD.classList.add('stage-active'); }
+            else if(globalAvg <= 2.4) { gLvl = "INTERMÉDIAIRE"; gCol = '#00B0FF'; sD.classList.add('stage-active'); sI.classList.add('stage-active'); }
+            else { gLvl = "AVANCÉ"; gCol = '#00E676'; sD.classList.add('stage-active'); sI.classList.add('stage-active'); sE.classList.add('stage-active'); }
+        }
+        
+        if(totalAnswered >= 5) {
+            document.getElementById('archetype-container').style.display = 'block';
+            let cat0 = catAverages[0] || 0, cat1 = catAverages[1] || 0, cat2 = catAverages[2] || 0, cat3 = catAverages[3] || 0;
+            let personaKey = (cat0 >= Math.max(cat1, cat2, cat3)) ? "architecte" : (cat3 >= Math.max(cat0, cat1, cat2)) ? "facilitateur" : (cat2 >= Math.max(cat0, cat1, cat3)) ? "explorateur" : "stratège";
+            if (globalAvg > 2.3 && (Math.max(...catAverages) - Math.min(...catAverages) < 0.7)) personaKey = "stratège";
+            currentPersonaTitle = archetypes[personaKey].t;
+            document.getElementById('profile-type-badge').innerText = currentPersonaTitle;
+            document.getElementById('profile-description').innerText = archetypes[personaKey].d;
+        }
+
+        document.getElementById('gauge-label').innerText = `Moyenne : ${currentAvg} (${gLvl})`;
+        document.getElementById('gauge-label').style.color = gCol;
+        document.getElementById('completion-tracker').innerText = totalAnswered + " / 20 questions répondues";
+        document.getElementById('resList').innerHTML = resHtml || "<p>Répondez au questionnaire.</p>";
+        autoSaveData();
+    }
+
+    function autoSaveData() {
+        const data = { name: document.getElementById('user-name').value, answers: {}, notes: {} };
+        document.querySelectorAll('input:checked').forEach(i => data.answers[i.name] = i.value);
+        for(let i=0; i<4; i++) data.notes[i] = document.getElementById(`notes-${i}`).value;
+        localStorage.setItem('fad_final_secure', JSON.stringify(data));
+        const cloud = document.getElementById('save-cloud'); cloud.classList.add('active'); cloud.title = `Sauvegarde auto : ${new Date().toLocaleTimeString()}`;
+    }
+
+    function saveJSON() {
+        const data = JSON.parse(localStorage.getItem('fad_final_secure'));
+        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], {type: "application/json"})); a.download = "positionnement.json"; a.click();
+    }
+
+    function loadJSON(e) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+            const data = JSON.parse(ev.target.result);
+            document.getElementById('user-name').value = data.name || "";
+            for(let k in data.answers) { let r = document.querySelector(`input[name="${k}"][value="${data.answers[k]}"]`); if(r) r.checked = true; }
+            for(let k in data.notes) if(document.getElementById(`notes-${k}`)) document.getElementById(`notes-${k}`).value = data.notes[k];
+            updateProgression();
+        };
+        reader.readAsText(e.target.files[0]);
+    }
+
+    function resetForm() {
+        if(confirm("Effacer tout ?")) {
+            document.getElementById('user-name').value = "";
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            document.querySelectorAll('.notes-area').forEach(t => t.value = "");
+            localStorage.removeItem('fad_final_secure');
+            updateProgression();
+        }
+    }
+
+    window.onload = () => {
+        const saved = localStorage.getItem('fad_final_secure');
+        if(saved) {
+            const data = JSON.parse(saved);
+            document.getElementById('user-name').value = data.name || "";
+            for(let k in data.answers) { let r = document.querySelector(`input[name="${k}"][value="${data.answers[k]}"]`); if(r) r.checked = true; }
+            for(let k in data.notes) if(document.getElementById(`notes-${k}`)) document.getElementById(`notes-${k}`).value = data.notes[k];
+            updateProgression();
+        }
+    };
+</script>
+</body>
+</html>
