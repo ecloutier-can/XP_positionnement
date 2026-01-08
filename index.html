@@ -1,5 +1,3 @@
---- START OF FILE Outils positionnement EXPV10.html ---
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -256,7 +254,7 @@
             <h2 style="margin-top:0">Votre Plan de Formation Personnalisé</h2>
             <div id="resList"><p>Répondez au questionnaire pour générer vos recommandations sur mesure.</p></div>
             <div id="transversal-resources">
-                <div class="category-title">ORGANISMES & COMMUNAUTÉS d'EXPERTS</div>
+                <div class="category-title">ORGANISMES & COMMUNAUTÉS D'EXPERTS</div>
                 <div class="res-item"><strong>FADIO</strong> - Expertise Québec. <a href="https://fadio.net/" target="_blank" onmouseenter="showPreview(event, 'FADIO', 'Partage d’expertise interordres au Québec.')" onmouseleave="hidePreview()">Visiter</a></div>
                 <div class="res-item"><strong>CADRE21</strong> - Badges numériques. <a href="https://www.cadre21.org/axefad/" target="_blank" onmouseenter="showPreview(event, 'CADRE21', 'Formations certifiées enseignants.')" onmouseleave="hidePreview()">Visiter</a></div>
                 <div style="text-align: center; margin-top: 15px;"><img src="https://scontent.fyhu1-1.fna.fbcdn.net/v/t39.30808-1/404883401_122105338394121903_5166034736891145140_n.jpg?stp=dst-jpg_s480x480_tt6&_nc_cat=103&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=KDi4_6aa7GYQ7kNvwHCFhSE&_nc_oc=AdkS2V8mP8-XCdbVVif8_Eqt4ZwaVcPWQ9cdgiTFZlI3j0Olv3C2UiyqXBb0sbe0pbg&_nc_zt=24&_nc_ht=scontent.fyhu1-1.fna&_nc_gid=oTyuj9Dc4YcPkuALPkl5zg&oh=00_AfqzNXcjq1m6rp55ddRuf5dk6NL2LSBKMbopl4O8g1bDzA&oe=69633670" style="max-width: 100px; border-radius: 10px; border: 2px solid var(--accent-color);"></div>
@@ -340,7 +338,27 @@
     function exportPDF() {
         const name = document.getElementById('user-name').value || "Enseignant(e)";
         const element = document.createElement('div');
-        element.innerHTML = `<h1 style="color:#2e3192; text-align:center">BILAN FAD : ${name.toUpperCase()}</h1><div style="padding:20px; border:1px solid #ddd; border-radius:10px"><h2>Profil : ${currentPersonaTitle}</h2><p>Moyenne : ${currentAvg}</p><hr>${document.getElementById('resList').innerHTML}</div>`;
+        
+        // --- NOUVEAUTÉ : Récupération des réflexions pour le PDF ---
+        let reflectionsHtml = "";
+        for (let i = 0; i < 4; i++) {
+            const note = document.getElementById(`notes-${i}`).value.trim();
+            if (note) {
+                reflectionsHtml += `<p><strong>Réflexion sur ${questions[i].cat} :</strong><br>${note.replace(/\n/g, '<br>')}</p>`;
+            }
+        }
+        if (reflectionsHtml) reflectionsHtml = `<hr><h3 style="color:#2e3192">MES RÉFLEXIONS</h3>` + reflectionsHtml;
+        // -----------------------------------------------------------
+
+        element.innerHTML = `<h1 style="color:#2e3192; text-align:center">BILAN FAD : ${name.toUpperCase()}</h1>
+            <div style="padding:20px; border:1px solid #ddd; border-radius:10px">
+                <h2>Profil : ${currentPersonaTitle}</h2>
+                <p>Moyenne : ${currentAvg}</p>
+                <hr>
+                ${document.getElementById('resList').innerHTML}
+                ${reflectionsHtml}
+            </div>`;
+        
         html2pdf().set({ margin: 10, filename: `PlanFAD_${name}.pdf`, html2canvas: { scale: 2 }, jsPDF: { format: 'a4' } }).from(element).save();
     }
 
@@ -364,14 +382,12 @@
             catAverages.push(catAvg);
             sumGlobal += catSum; totalAnswered += catCount;
 
-            // --- ANIMATION PILLIERS (LOGIQUE GRADUELLE MODIFIÉE) ---
+            // --- ANIMATION PILLIERS (GRADUELLE : 1/3, 1/2, 100%) ---
             let fillHeight = 0;
             if (catAvg > 0) {
                 if (catAvg <= 2) {
-                    // Mapping de 1.0 (33.33%) à 2.0 (50%)
                     fillHeight = 33.33 + (catAvg - 1) * 16.67;
                 } else {
-                    // Mapping de 2.0 (50%) à 3.0 (100%)
                     fillHeight = 50 + (catAvg - 2) * 50;
                 }
             }
@@ -389,13 +405,13 @@
         let globalAvg = totalAnswered > 0 ? (sumGlobal / totalAnswered) : 0;
         currentAvg = globalAvg.toFixed(2);
         
-        // --- LIGNE DE MOYENNE GLOBALE (LOGIQUE ALIGNÉE) ---
+        // --- LIGNE DE MOYENNE GLOBALE (ALIGNÉE SUR LES PILLIERS) ---
         const line = document.getElementById('global-avg-line');
         if(globalAvg > 0) {
             let globalPercent = 0;
             if (globalAvg <= 2) globalPercent = 33.33 + (globalAvg - 1) * 16.67;
             else globalPercent = 50 + (globalAvg - 2) * 50;
-
+            
             line.style.opacity = 1;
             line.style.bottom = (11 + (globalPercent / 100 * 130)) + "px"; 
         } else { line.style.opacity = 0; }
