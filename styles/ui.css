@@ -1,0 +1,85 @@
+/* Design tokens */
+:root {
+  --ui-bg: #ffffff;
+  --ui-surface: #f8fafc;
+  --primary: #2e3192; /* existing primary */
+  --accent: #00a99d;
+  --danger: #e74c3c;
+  --muted: #888888;
+  --text: #222222;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.08);
+  --shadow-md: 0 8px 20px rgba(0,0,0,0.12);
+
+  --space-xs: 6px;
+  --space-sm: 10px;
+  --space-md: 14px;
+  --space-lg: 20px;
+
+  --transition-fast: 150ms;
+  --transition-md: 220ms;
+}
+
+/* Header */
+header {
+  height: var(--header-height);
+  padding: 18px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+header h1 {
+  color: white;
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+/* Buttons */
+button.action-card {
+  background: rgba(255,255,255,0.06);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  min-width: 88px;
+  transition: transform var(--transition-md) ease, box-shadow var(--transition-md) ease;
+}
+
+button.action-card .icon { width: 20px; height: 20px; display:inline-flex; align-items:center; justify-content:center; }
+button.action-card .icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; }
+
+button.action-card:focus { box-shadow: 0 0 0 4px rgba(0,169,157,0.14); outline: none; }
+
+.btn-card-danger { border-bottom-color: var(--danger) !important; }
+.btn-card-gestion { border-bottom-color: var(--accent) !important; }
+.btn-card-result { border-bottom-color: #8e44ad !important; }
+
+/* Top-left tools compact styling */
+.top-left-tools { left: 12px; top: 10px; }
+.top-left-tools .dark-mode-card { padding: 6px; border-radius: 8px; background: transparent; }
+.top-left-tools .dark-mode-card .icon svg, .top-left-tools .save-indicator .cloud-svg svg { stroke: white; }
+
+/* Save indicator minimal */
+.save-indicator { display:inline-flex; align-items:center; gap:6px; padding:6px; border-radius:999px; }
+.save-indicator.active { transform: scale(1.02); box-shadow: 0 6px 18px rgba(0,169,157,0.12); }
+.save-indicator.success { background: rgba(39,174,96,0.12); }
+
+/* Small responsive tweaks */
+@media (max-width: 600px) {
+  header { padding: 12px 14px; }
+  header h1 { font-size: 1.1rem; }
+  .action-station { gap: 8px; }
+  button.action-card { min-width: 72px; padding: 8px 10px; font-size: 0.85rem; }
+}
