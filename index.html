@@ -281,7 +281,7 @@
         </div>
     </div>
     <h1>Outils de positionnement de mes habiletés technologiques en FAD</h1>
-    <div class="header-profile">Bonjour <input type="text" id="user-name" placeholder="Enseignant(e)" oninput="autoSaveData()">, voici votre bilan.</div>
+    <div class="header-profile">Bonjour <input type="text" id="user-name" placeholder="Enseignant(e)" aria-label="Nom de l'enseignant(e)" oninput="autoSaveData()">, voici votre bilan.</div>
         <div class="action-station">
         <button class="action-card btn-card-danger" onclick="resetForm()" aria-label="Réinitialiser le questionnaire">
             <svg class="icon" aria-hidden="true"><use href="#icon-refresh"></use></svg>
@@ -308,7 +308,7 @@
     </div>
 </header>
 
-<div id="res-preview-tooltip"></div>
+<div id="res-preview-tooltip" role="tooltip" aria-hidden="true"></div>
 
 <main>
     <section id="panel-questions">
@@ -351,9 +351,9 @@
             </div>
 
             <div class="growth-container">
-                <div class="growth-stage" id="stage-debut"><span>🌱</span></div>
-                <div class="growth-stage" id="stage-inter"><span>🌿</span></div>
-                <div class="growth-stage" id="stage-expert"><span>🌳</span></div>
+                <div class="growth-stage" id="stage-debut"><span aria-hidden="true">🌱</span></div>
+                <div class="growth-stage" id="stage-inter"><span aria-hidden="true">🌿</span></div>
+                <div class="growth-stage" id="stage-expert"><span aria-hidden="true">🌳</span></div>
             </div>
             <div id="completion-tracker">0 / 20 questions répondues</div>
         </section>
@@ -365,7 +365,7 @@
                 <div class="category-title">ORGANISMES & COMMUNAUTÉS D'EXPERTS</div>
                 <div class="res-item"><strong>FADIO</strong> - Expertise Québec. <a href="https://fadio.net/" target="_blank" onmouseenter="showPreview(event, 'FADIO', 'Partage d’expertise interordres au Québec.')" onmouseleave="hidePreview()">Visiter</a></div>
                 <div class="res-item"><strong>CADRE21</strong> - Badges numériques. <a href="https://www.cadre21.org/axefad/" target="_blank" onmouseenter="showPreview(event, 'CADRE21', 'Formations certifiées enseignants.')" onmouseleave="hidePreview()">Visiter</a></div>
-                <div style="text-align: center; margin-top: 15px;"><img src="https://scontent.fyhu1-1.fna.fbcdn.net/v/t39.30808-1/404883401_122105338394121903_5166034736891145140_n.jpg?stp=dst-jpg_s480x480_tt6&_nc_cat=103&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=KDi4_6aa7GYQ7kNvwHCFhSE&_nc_oc=AdkS2V8mP8-XCdbVVif8_Eqt4ZwaVcPWQ9cdgiTFZlI3j0Olv3C2UiyqXBb0sbe0pbg&_nc_zt=24&_nc_ht=scontent.fyhu1-1.fna&_nc_gid=oTyuj9Dc4YcPkuALPkl5zg&oh=00_AfqzNXcjq1m6rp55ddRuf5dk6NL2LSBKMbopl4O8g1bDzA&oe=69633670" style="max-width: 100px; border-radius: 10px; border: 2px solid var(--accent-color);"></div>
+                <div style="text-align: center; margin-top: 15px;"><img src="https://scontent.fyhu1-1.fna.fbcdn.net/v/t39.30808-1/404883401_122105338394121903_5166034736891145140_n.jpg?stp=dst-jpg_s480x480_tt6&_nc_cat=103&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=KDi4_6aa7GYQ7kNvwHCFhSE&_nc_oc=AdkS2V8mP8-XCdbVVif8_Eqt4ZwaVcPWQ9cdgiTFZlI3j0Olv3C2UiyqXBb0sbe0pbg&_nc_zt=24&_nc_ht=scontent.fyhu1-1.fna&_nc_gid=oTyuj9Dc4YcPkuALPkl5zg&oh=00_AfqzNXcjq1m6rp55ddRuf5dk6NL2LSBKMbopl4O8g1bDzA&oe=69633670" alt="Illustration ressources FAD" style="max-width: 100px; border-radius: 10px; border: 2px solid var(--accent-color);"></div>
             </div>
         </section>
     </div>
@@ -434,9 +434,12 @@
 
     function showPreview(e, title, desc) { 
         const tooltip = document.getElementById('res-preview-tooltip');
-        tooltip.innerHTML = `<h4>${title}</h4><p>${desc}</p>`; tooltip.style.display = 'block'; tooltip.style.left = (e.pageX + 15) + 'px'; tooltip.style.top = (e.pageY + 15) + 'px'; 
+        tooltip.innerHTML = `<h4>${title}</h4><p>${desc}</p>`;
+        tooltip.style.display = 'block'; tooltip.style.left = (e.pageX + 15) + 'px'; tooltip.style.top = (e.pageY + 15) + 'px';
+        tooltip.setAttribute('aria-hidden', 'false');
     }
-    function hidePreview() { document.getElementById('res-preview-tooltip').style.display = 'none'; }
+
+    function hidePreview() { const t = document.getElementById('res-preview-tooltip'); t.style.display = 'none'; t.setAttribute('aria-hidden','true'); }
 
     function toggleDarkMode() {
         document.body.classList.toggle('dark-mode');
@@ -558,30 +561,30 @@
         const data = { name: document.getElementById('user-name').value, answers: {}, notes: {} };
         document.querySelectorAll('input:checked').forEach(i => data.answers[i.name] = i.value);
         for(let i=0; i<4; i++) data.notes[i] = document.getElementById(`notes-${i}`).value;
-        localStorage.setItem('fad_final_secure', JSON.stringify(data));
+        try { localStorage.setItem('fad_final_secure', JSON.stringify(data)); } catch(e) { console.warn('LocalStorage failed', e); }
         const cloud = document.getElementById('save-cloud');
-        // Animation: état actif (en cours), puis état succès temporaire
-        cloud.classList.remove('success');
-        cloud.classList.add('active');
+        // Use standardized utility classes: is-loading then is-success
+        cloud.classList.remove('is-success', 'is-error');
+        cloud.classList.add('is-loading');
         const now = new Date();
         const timeStr = now.toLocaleTimeString();
         cloud.title = `Sauvegarde auto : ${timeStr}`;
         // update aria for screen readers
         cloud.setAttribute('aria-label', `Sauvegarde en cours, ${timeStr}`);
-    // keep save indicator compact: do not show visible text to avoid menu shift
-    const labelEl = cloud.querySelector('.save-label');
-    if(labelEl) labelEl.innerText = '';
+        // keep save indicator compact: do not show visible text to avoid menu shift
+        const labelEl = cloud.querySelector('.save-label');
+        if(labelEl) labelEl.innerText = '';
         // clear previous timeouts if any
         if(cloud._saveTimeout) clearTimeout(cloud._saveTimeout);
         if(cloud._saveTimeout2) clearTimeout(cloud._saveTimeout2);
         cloud._saveTimeout = setTimeout(() => {
-            cloud.classList.remove('active');
-            cloud.classList.add('success');
+            cloud.classList.remove('is-loading');
+            cloud.classList.add('is-success');
             // update aria to indicate success (no visible text to avoid layout shift)
             const finishTime = new Date().toLocaleTimeString();
             cloud.setAttribute('aria-label', `Sauvegarde terminée à ${finishTime}`);
             // remove success state after a short delay
-            cloud._saveTimeout2 = setTimeout(() => { cloud.classList.remove('success'); }, 2200);
+            cloud._saveTimeout2 = setTimeout(() => { cloud.classList.remove('is-success'); }, 2200);
         }, 700);
     }
 
@@ -628,6 +631,34 @@
             }, 30000);
         }
     };
+</script>
+
+<!-- Axe-core quick runner: append ?axe=1 to the URL to run an accessibility audit in the browser and log results to console -->
+<script>
+if (location.search.indexOf('axe=1') !== -1) {
+    (function(){
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.3/axe.min.js';
+        s.onload = () => {
+            console.info('axe-core loaded — running audit (wcag2a/wcag2aa)...');
+            axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a','wcag2aa'] } }, (err, results) => {
+                if (err) { console.error('axe error', err); return; }
+                console.log('Axe results:', results);
+                const critical = results.violations.filter(v => v.impact === 'critical' || v.impact === 'serious');
+                if (critical.length) {
+                    console.group('Axe critical/serious violations');
+                    critical.forEach(v => { console.warn(v.id, v.impact, v.help, v.nodes.length, v.nodes.map(n=>n.target)); });
+                    console.groupEnd();
+                    alert('Axe audit: ' + critical.length + ' critical/serious violation(s) found — check console for details.');
+                } else {
+                    console.info('Axe: no critical or serious violations found.');
+                    alert('Axe audit: no critical/serious violations found.');
+                }
+            });
+        };
+        document.head.appendChild(s);
+    })();
+}
 </script>
 </body>
 </html>

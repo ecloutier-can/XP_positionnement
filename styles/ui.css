@@ -83,3 +83,13 @@ button.action-card:focus { box-shadow: 0 0 0 4px rgba(0,169,157,0.14); outline: 
   .action-station { gap: 8px; }
   button.action-card { min-width: 72px; padding: 8px 10px; font-size: 0.85rem; }
 }
+
+/* --- State utility classes (standardized) --- */
+/* Use these classes across components to indicate transient states */
+/* generic state hooks kept empty intentionally; visual mapping below applies to specific components like .save-indicator */
+
+/* Map utilities to save-indicator visual styles so JS can toggle simple class names */
+.save-indicator.is-loading { transform: scale(1.02); box-shadow: 0 6px 22px rgba(0,169,157,0.12); animation: pulseBig 1s infinite; }
+.save-indicator.is-success { background: linear-gradient(90deg,#2ecc71,#27ae60); color: #fff; box-shadow: 0 8px 28px rgba(39,174,96,0.22); animation: pop 0.45s ease forwards; }
+.save-indicator.is-error { background: rgba(231,76,60,0.08); color: var(--danger); box-shadow: 0 8px 20px rgba(231,76,60,0.12); }
+
