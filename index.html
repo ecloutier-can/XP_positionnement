@@ -114,6 +114,16 @@
     @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.18); } 100% { transform: scale(1); } }
     .sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
 
+    /* Top-left placement for dark/save tools */
+    .top-left-tools { position: absolute; left: 16px; top: 12px; display: flex; gap: 10px; align-items: center; z-index: 1200; }
+    .top-left-tools .dark-mode-card { padding: 6px; border-radius: 8px; background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.85); font-size: 0.9rem; }
+    .top-left-tools .dark-mode-card:hover { background: rgba(255,255,255,0.04); }
+    /* compact save indicator in top-left */
+    .top-left-tools .save-indicator { padding: 6px; gap:6px; background: transparent; box-shadow: none; }
+    .top-left-tools .save-indicator .cloud-svg svg { width:16px; height:16px; }
+    .top-left-tools .save-indicator.active { box-shadow: 0 6px 18px rgba(0,169,157,0.12); transform: scale(1.02); }
+    .top-left-tools .save-indicator.success { background: rgba(39,174,96,0.12); color: white; box-shadow: 0 8px 20px rgba(39,174,96,0.18); }
+
     .settings-stack { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; margin-left: 8px; }
         .dark-mode-card { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: white; transition: transform 0.3s; }
     .dark-mode-card .icon { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; }
@@ -214,6 +224,19 @@
 <body>
 
 <header>
+    <!-- Top-left tools: dark-mode + save indicator (moved for a more discrete placement) -->
+    <div class="top-left-tools" aria-hidden="false">
+        <button class="dark-mode-card" onclick="toggleDarkMode()" id="dark-icon" title="Basculer mode sombre" aria-label="Basculer mode sombre">
+            <span class="icon" aria-hidden="true">
+                <!-- Moon icon -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </span>
+        </button>
+        <div class="save-indicator" id="save-cloud" title="Sauvegarde auto" role="status" aria-live="polite" aria-label="Indicateur de sauvegarde">
+            <span class="cloud-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M20 17.58A4 4 0 0 0 16 14H15a4 4 0 0 0-7.75-1.5A3 3 0 1 0 4 18h12a4 4 0 0 0 4-4c0-.22-.02-.43-.06-.64"/></svg></span>
+            <span class="sr-only">Sauvegarde automatique</span>
+        </div>
+    </div>
     <h1>Outils de positionnement de mes habiletés technologiques en FAD</h1>
     <div class="header-profile">Bonjour <input type="text" id="user-name" placeholder="Enseignant(e)" oninput="autoSaveData()">, voici votre bilan.</div>
         <div class="action-station">
@@ -238,19 +261,7 @@
             <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5h20v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg></span>
             <span class="btn-label">Imprimer</span>
         </button>
-        <div class="settings-stack">
-            <button class="dark-mode-card" onclick="toggleDarkMode()" id="dark-icon" title="Mode Sombre" aria-label="Basculer mode sombre">
-                <span class="icon" aria-hidden="true">
-                    <!-- Moon icon -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                </span>
-            </button>
-            <div class="save-indicator" id="save-cloud" title="Sauvegarde auto" role="status" aria-live="polite" aria-label="Indicateur de sauvegarde">
-                <span class="cloud-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M20 17.58A4 4 0 0 0 16 14H15a4 4 0 0 0-7.75-1.5A3 3 0 1 0 4 18h12a4 4 0 0 0 4-4c0-.22-.02-.43-.06-.64"/></svg></span>
-                <span class="save-label" aria-hidden="true"></span>
-                <span class="sr-only">Sauvegarde automatique</span>
-            </div>
-        </div>
+        <!-- tools moved to top-left for a more discrete placement -->
     </div>
 </header>
 
@@ -514,21 +525,20 @@
         cloud.title = `Sauvegarde auto : ${timeStr}`;
         // update aria for screen readers
         cloud.setAttribute('aria-label', `Sauvegarde en cours, ${timeStr}`);
-        // visible label for sighted users
-        const labelEl = cloud.querySelector('.save-label');
-        if(labelEl) labelEl.innerText = 'Sauvegarde en cours…';
+    // keep save indicator compact: do not show visible text to avoid menu shift
+    const labelEl = cloud.querySelector('.save-label');
+    if(labelEl) labelEl.innerText = '';
         // clear previous timeouts if any
         if(cloud._saveTimeout) clearTimeout(cloud._saveTimeout);
         if(cloud._saveTimeout2) clearTimeout(cloud._saveTimeout2);
         cloud._saveTimeout = setTimeout(() => {
             cloud.classList.remove('active');
             cloud.classList.add('success');
-            // update aria to indicate success and update visible label
+            // update aria to indicate success (no visible text to avoid layout shift)
             const finishTime = new Date().toLocaleTimeString();
             cloud.setAttribute('aria-label', `Sauvegarde terminée à ${finishTime}`);
-            if(labelEl) labelEl.innerText = 'Sauvegarde terminée';
-            // remove success state and clear label after a short delay
-            cloud._saveTimeout2 = setTimeout(() => { cloud.classList.remove('success'); if(labelEl) labelEl.innerText = ''; }, 2200);
+            // remove success state after a short delay
+            cloud._saveTimeout2 = setTimeout(() => { cloud.classList.remove('success'); }, 2200);
         }, 700);
     }
 
