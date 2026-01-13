@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Outils de positionnement FAD — Prototype</title>
+  <style>
+    :root{
+      --primary:#2e3192; --accent:#00a99d; --bg:#f6f8f9; --panel:#fff; --muted:#666;
+      --header-h:180px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, system-ui, -apple-system, Arial, sans-serif;background:var(--bg);color:#222}
+    header{height:var(--header-h);background:linear-gradient(135deg,#1b1e5d,#2e3192);color:#fff;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+    header h1{margin:0;font-size:1.2rem}
+    .action-row{margin-top:12px;display:flex;gap:8px}
+    button.action-card{background:rgba(255,255,255,0.08);border:0;color:#fff;padding:8px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:700}
+    button.action-card:focus{outline:3px solid rgba(0,169,157,0.16)}
+    .icon{width:20px;height:20px;display:inline-flex}
+    main{display:flex;height:calc(100vh - var(--header-h));overflow:hidden}
+    #panel-questions{width:480px;padding:18px;overflow:auto;background:var(--panel);border-right:1px solid #e6e9eb}
+    #right{flex:1;overflow:auto;padding:18px}
+    .question-box{background:#fafafa;border:1px solid #eee;padding:12px;border-radius:8px;margin-bottom:12px}
+    .notes-area{width:100%;min-height:80px;padding:8px}
+    .save-indicator{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.06)}
+    .save-indicator.is-loading{box-shadow:0 6px 18px rgba(0,169,157,0.12);transform:scale(1.02)}
+    .save-indicator.is-success{background:linear-gradient(90deg,#2ecc71,#27ae60);box-shadow:0 8px 22px rgba(39,174,96,0.18)}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  </style>
+</head>
+<body>
+  <!-- SVG sprite -->
+  <svg aria-hidden="true" style="display:none">
+    <symbol id="icon-refresh" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" fill="none" d="M20.49 9A9 9 0 1 0 21 12"/><path stroke="currentColor" stroke-width="1.5" fill="none" d="M21 3v6h-6"/></symbol>
+    <symbol id="icon-save" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" fill="none" d="M12 3v12"/><path stroke="currentColor" stroke-width="1.5" fill="none" d="M21 21H3"/></symbol>
+    <symbol id="icon-open" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" fill="none" d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/></symbol>
+    <symbol id="icon-print" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" fill="none" d="M6 9V3h12v6"/></symbol>
+    <symbol id="icon-cloud" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.5" fill="none" d="M20 17.58A4 4 0 0 0 16 14H15a4 4 0 0 0-7.75-1.5A3 3 0 1 0 4 18h12a4 4 0 0 0 4-4"/></symbol>
+  </svg>
+
+  <header>
+    <h1>Outils de positionnement — FAD</h1>
+
+    <div class="action-row" role="toolbar" aria-label="Actions">
+      <button class="action-card" onclick="resetForm()" aria-label="Réinitialiser"><span class="icon" aria-hidden><svg><use href="#icon-refresh"></use></svg></span><span>Réinitialiser</span></button>
+      <button class="action-card" onclick="saveJSON()" aria-label="Sauvegarder"><span class="icon" aria-hidden><svg><use href="#icon-save"></use></svg></span><span>Sauvegarder</span></button>
+      <button class="action-card" onclick="document.getElementById('fileInput').click()" aria-label="Ouvrir"><span class="icon" aria-hidden><svg><use href="#icon-open"></use></svg></span><span>Ouvrir</span></button>
+      <button class="action-card" onclick="exportPDF()" aria-label="Plan PDF"><span class="icon" aria-hidden><svg><use href="#icon-print"></use></svg></span><span>Plan PDF</span></button>
+      <input id="fileInput" type="file" accept="application/json" style="display:none" onchange="loadJSON(event)">
+    </div>
+
+    <div style="position:absolute;left:16px;top:12px;display:flex;gap:8px;align-items:center">
+      <div id="save-cloud" class="save-indicator" role="status" aria-live="polite" aria-atomic="true" aria-label="Sauvegarde automatique">
+        <svg class="icon" aria-hidden><use href="#icon-cloud"></use></svg>
+        <span class="sr-only">Sauvegarde automatique</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="panel-questions"><div id="questions-list"></div></section>
+    <div id="right"><h2>Plan personnalisé</h2><div id="resList"><p>Répondez au questionnaire pour générer des recommandations.</p></div>
+      <div style="margin-top:18px;text-align:center">
+        <img src="https://2024.sommetnumerique.ca/fr/partenaire/download/logo/20" alt="Logo Sommet numérique 2024" style="max-width:120px;height:auto;border-radius:8px;border:2px solid var(--accent);" loading="lazy">
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // --- data (single declaration) ---
+    const questions = [
+      { id:0, cat:'ÉLABORATION', q:[{id:'q1',t:'1.1 Avez-vous un modèle pédagogique ?',a:'Non',b:'Parfois',c:'Oui'},{id:'q2',t:'1.2 Testez-vous les outils ?',a:'Non',b:'Parfois',c:'Oui'}]},
+      { id:1, cat:'DÉMARCHE', q:[{id:'q3',t:'2.1 Variez-vous les activités ?',a:'Non',b:'Parfois',c:'Oui'}] }
+    ];
+
+    // render questions once
+    const qList = document.getElementById('questions-list');
+    questions.forEach(group=>{
+      qList.insertAdjacentHTML('beforeend', `<h3 style="margin-top:0">${group.cat}</h3>`);
+      group.q.forEach(item=>{
+        qList.insertAdjacentHTML('beforeend', `
+          <div class="question-box" id="box-${item.id}">
+            <div>${item.t}</div>
+            <label><input type="radio" name="${item.id}" value="1" onchange="updateProgression()"> A) ${item.a}</label><br>
+            <label><input type="radio" name="${item.id}" value="2" onchange="updateProgression()"> B) ${item.b}</label><br>
+            <label><input type="radio" name="${item.id}" value="3" onchange="updateProgression()"> C) ${item.c}</label>
+          </div>
+        `);
+      });
+      qList.insertAdjacentHTML('beforeend', `<textarea class="notes-area" id="notes-${group.id}" placeholder="Réflexions..." oninput="autoSaveData()"></textarea>`);
+    });
+
+    // autosave implementation
+    function autoSaveData(){
+      const data = { answers: {}, notes: {} };
+      document.querySelectorAll('input[type=radio]:checked').forEach(i=>data.answers[i.name]=i.value);
+      for(let i=0;i<questions.length;i++) data.notes[i]=document.getElementById('notes-'+i)?.value||'';
+      try{ localStorage.setItem('fad_final_secure', JSON.stringify(data)); }catch(e){ console.warn('localStorage',e) }
+
+      const cloud = document.getElementById('save-cloud');
+      cloud.classList.remove('is-success'); cloud.classList.add('is-loading');
+      cloud.setAttribute('aria-label','Sauvegarde en cours');
+      clearTimeout(cloud._t);
+      cloud._t = setTimeout(()=>{
+        cloud.classList.remove('is-loading'); cloud.classList.add('is-success');
+        cloud.setAttribute('aria-label','Sauvegarde terminée');
+        clearTimeout(cloud._t2);
+        cloud._t2 = setTimeout(()=>cloud.classList.remove('is-success'), 1600);
+      }, 700);
+    }
+
+    function updateProgression(){
+      let html='';
+      questions.forEach(g=>{
+        const answered = g.q.some(q => !!document.querySelector(`input[name="${q.id}"]:checked`));
+        if(answered) html += `<div class="res-item"><strong>${g.cat}</strong> : ressources suggérées</div>`;
+      });
+      document.getElementById('resList').innerHTML = html || '<p>Répondez aux questions pour générer des ressources.</p>';
+      autoSaveData();
+    }
+
+    // file save/load/export utilities
+    function saveJSON(){ const data = localStorage.getItem('fad_final_secure') || '{}'; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data],{type:'application/json'})); a.download='positionnement.json'; a.click(); }
+    function loadJSON(e){ const r = new FileReader(); r.onload = ev=>{ try{ const d = JSON.parse(ev.target.result); for(const k in d.answers){ const el = document.querySelector(`input[name="${k}"][value="${d.answers[k]}"]`); if(el) el.checked = true } for(const n in d.notes) if(document.getElementById('notes-'+n)) document.getElementById('notes-'+n).value = d.notes[n]; updateProgression(); }catch(err){ alert('Fichier invalide') } }; r.readAsText(e.target.files[0]); }
+    function resetForm(){ if(confirm('Effacer tout ?')){ document.querySelectorAll('input[type=radio]').forEach(i=>i.checked=false); document.querySelectorAll('.notes-area').forEach(t=>t.value=''); localStorage.removeItem('fad_final_secure'); updateProgression(); } }
+    function exportPDF(){ alert('Génération PDF (prototype)'); }
+
+    // autosave interval guard + restore
+    if(!window._autoSaveInterval) window._autoSaveInterval = setInterval(autoSaveData, 30000);
+    try{
+      const s = localStorage.getItem('fad_final_secure');
+      if(s){ const d = JSON.parse(s); for(const k in d.answers){ const el = document.querySelector(`input[name="${k}"][value="${d.answers[k]}"]`); if(el) el.checked = true } for(const n in d.notes) if(document.getElementById('notes-'+n)) document.getElementById('notes-'+n).value = d.notes[n]; updateProgression(); }
+    }catch(e){ console.warn(e) }
+
+    // optional axe-core runner when ?axe=1
+    if(location.search.indexOf('axe=1') !== -1){
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.3/axe.min.js';
+      s.onload = ()=>axe.run(document).then(r=>console.log('Axe results',r));
+      document.head.appendChild(s);
+    }
+  </script>
+</body>
+</html>
