@@ -224,17 +224,59 @@
 </head>
 <body>
 
+<!-- SVG sprite (Heroicons-like) - symbols reused across the UI -->
+<svg aria-hidden="true" style="display:none">
+    <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.49 9A9 9 0 1 0 21 12" />
+        <path d="M21 3v6h-6" />
+    </symbol>
+    <symbol id="icon-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v12" />
+        <path d="M8 11l4-4 4 4" />
+        <path d="M21 21H3" />
+    </symbol>
+    <symbol id="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7" />
+        <path d="M16 3h-8l-2 4h12l-2-4z" />
+    </symbol>
+    <symbol id="icon-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <path d="M14 2v6h6" />
+        <path d="M16 13H8" />
+        <path d="M16 17H8" />
+    </symbol>
+    <symbol id="icon-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 9V3h12v6" />
+        <path d="M6 18H4a2 2 0 0 1-2-2v-3h20v3a2 2 0 0 1-2 2h-2" />
+        <path d="M6 14h12v8H6z" />
+    </symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2" />
+        <path d="M12 20v2" />
+        <path d="M4.93 4.93l1.41 1.41" />
+        <path d="M17.66 17.66l1.41 1.41" />
+        <path d="M2 12h2" />
+        <path d="M20 12h2" />
+        <path d="M4.93 19.07l1.41-1.41" />
+        <path d="M17.66 6.34l1.41-1.41" />
+    </symbol>
+    <symbol id="icon-cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 17.58A4 4 0 0 0 16 14H15a4 4 0 0 0-7.75-1.5A3 3 0 1 0 4 18h12a4 4 0 0 0 4-4"/>
+    </symbol>
+</svg>
+
 <header>
     <!-- Top-left tools: dark-mode + save indicator (moved for a more discrete placement) -->
     <div class="top-left-tools" aria-hidden="false">
         <button class="dark-mode-card" onclick="toggleDarkMode()" id="dark-icon" title="Basculer mode sombre" aria-label="Basculer mode sombre">
-            <span class="icon" aria-hidden="true">
-                <!-- Moon icon -->
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            </span>
+            <svg class="icon" aria-hidden="true"><use href="#icon-moon"></use></svg>
         </button>
         <div class="save-indicator" id="save-cloud" title="Sauvegarde auto" role="status" aria-live="polite" aria-label="Indicateur de sauvegarde">
-            <span class="cloud-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M20 17.58A4 4 0 0 0 16 14H15a4 4 0 0 0-7.75-1.5A3 3 0 1 0 4 18h12a4 4 0 0 0 4-4c0-.22-.02-.43-.06-.64"/></svg></span>
+            <span class="cloud-svg" aria-hidden="true"><svg class="icon"><use href="#icon-cloud"></use></svg></span>
             <span class="sr-only">Sauvegarde automatique</span>
         </div>
     </div>
@@ -242,24 +284,24 @@
     <div class="header-profile">Bonjour <input type="text" id="user-name" placeholder="Enseignant(e)" oninput="autoSaveData()">, voici votre bilan.</div>
         <div class="action-station">
         <button class="action-card btn-card-danger" onclick="resetForm()" aria-label="Réinitialiser le questionnaire">
-            <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.49 9A9 9 0 1 0 21 12"/><path d="M21 3v6h-6"/></svg></span>
+            <svg class="icon" aria-hidden="true"><use href="#icon-refresh"></use></svg>
             <span class="btn-label">Réinitialiser</span>
         </button>
         <button class="action-card btn-card-gestion" onclick="saveJSON()" aria-label="Télécharger la sauvegarde JSON">
-            <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8 11l4-4 4 4"/><path d="M21 21H3"/></svg></span>
+            <svg class="icon" aria-hidden="true"><use href="#icon-save"></use></svg>
             <span class="btn-label">Sauvegarder</span>
         </button>
         <button class="action-card btn-card-gestion" onclick="document.getElementById('fileInput').click()" aria-label="Ouvrir un fichier JSON de sauvegarde">
-            <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/><path d="M16 3h-8l-2 4h12l-2-4z"/></svg></span>
+            <svg class="icon" aria-hidden="true"><use href="#icon-open"></use></svg>
             <span class="btn-label">Ouvrir</span>
         </button>
         <input type="file" id="fileInput" style="display:none" onchange="loadJSON(event)">
         <button class="action-card btn-card-result" onclick="exportPDF()" aria-label="Générer le plan PDF">
-            <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span>
+            <svg class="icon" aria-hidden="true"><use href="#icon-doc"></use></svg>
             <span class="btn-label">Plan PDF</span>
         </button>
         <button class="action-card btn-card-result" onclick="window.print()" aria-label="Imprimer la page">
-            <span class="icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-3h20v3a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg></span>
+            <svg class="icon" aria-hidden="true"><use href="#icon-print"></use></svg>
             <span class="btn-label">Imprimer</span>
         </button>
         <!-- tools moved to top-left for a more discrete placement -->
@@ -399,9 +441,9 @@
     function toggleDarkMode() {
         document.body.classList.toggle('dark-mode');
         const btn = document.getElementById('dark-icon');
-        const moonSvg = '<span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>';
-        const sunSvg = '<span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/></svg></span>';
-        btn.innerHTML = document.body.classList.contains('dark-mode') ? sunSvg : moonSvg;
+        const moonUse = '<svg class="icon" aria-hidden="true"><use href="#icon-moon"></use></svg>';
+        const sunUse = '<svg class="icon" aria-hidden="true"><use href="#icon-sun"></use></svg>';
+        btn.innerHTML = document.body.classList.contains('dark-mode') ? sunUse : moonUse;
     }
 
     function exportPDF() {
